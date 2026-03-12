@@ -1,7 +1,7 @@
 # Group Meeting Summary – Handcrafted Haven
 
-**09.04.2026**  
-**19:00-20:00,UTC+1**  
+**Date:** 09.04.2026  
+**Time:** 19:00–20:00 (UTC+1) 
 
 ## Participants
 - Name 1
@@ -10,7 +10,7 @@
 - Name 4 
 - Name 5 
 
-## What We Discussed (Project Requirements & Scope)
+## What We Discussed 
 
 
 ## What We Completed Today

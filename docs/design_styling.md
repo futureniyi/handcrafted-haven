@@ -23,12 +23,12 @@
 
 ## 2) Color Palette
 **Primary color (main buttons/links):**  
-- Name:  
-- Hex:  
+- Name:  (Indigo/Purple) – Used for main backgrounds, header, and footer.
+- Hex:  #483D8B
 
 **Secondary / Accent color (badges/highlights):**  
-- Name:  
-- Hex:  
+- Name:  (Lavender) – Used for headings and link hover/active states.
+- Hex:  #E6E6FA 
 
 **Background color:**  
 - Hex:  
@@ -49,7 +49,9 @@
 
 ## 3) Typography
 **Main font (body text):**  
-- (e.g., Inter, Roboto, system-ui)
+- Montserrat – Used for headings and buttons
+- Lato – Used for body text and paragraphs
+- PT Serif – Used for quotes or special highlights (option
 
 **Heading style:**
 - H1 size:  
