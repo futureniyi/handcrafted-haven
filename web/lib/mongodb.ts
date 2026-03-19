@@ -1,15 +1,32 @@
 import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+// Use the provided connection string in production / CI.
+// For local development (or when no MONGODB_URI is provided),
+// spin up an in-memory MongoDB instance so the app can run without network.
+const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+let mongoMemoryServer: MongoMemoryServer | null = null;
+
+async function getConnectionString() {
+  if (MONGODB_URI) return MONGODB_URI;
+
+  if (!mongoMemoryServer) {
+    mongoMemoryServer = await MongoMemoryServer.create();
+  }
+
+  const uri = mongoMemoryServer.getUri();
+
+  // Ensure other modules can access this without calling getConnectionString again.
+  process.env.MONGODB_URI = uri;
+
+  return uri;
 }
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
  * in development. This prevents connections growing exponentially
- * during API Route usage.
+ * during API route usage.
  */
 let cached = (global as any).mongoose;
 
@@ -27,9 +44,9 @@ async function dbConnect() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = getConnectionString().then((uri) =>
+      mongoose.connect(uri, opts)
+    );
   }
 
   try {
