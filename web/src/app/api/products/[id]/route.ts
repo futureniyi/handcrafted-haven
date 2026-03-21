@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { verifyToken } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
@@ -12,6 +13,13 @@ export async function GET(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     const product = await Product.findById(id)
       .populate('sellerId', 'name bio story');
@@ -41,6 +49,13 @@ export async function PUT(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     // Verify authentication
     const authHeader = request.headers.get('authorization');
@@ -96,7 +111,10 @@ export async function PUT(
       );
     }
 
-    if (updateData.category && !['jewelry', 'clothing', 'home-decor', 'art', 'other'].includes(updateData.category)) {
+    if (
+      updateData.category &&
+      !['jewelry', 'clothing', 'home-decor', 'art', 'other'].includes(updateData.category)
+    ) {
       return NextResponse.json(
         { error: 'Invalid category' },
         { status: 400 }
@@ -127,6 +145,13 @@ export async function DELETE(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     // Verify authentication
     const authHeader = request.headers.get('authorization');

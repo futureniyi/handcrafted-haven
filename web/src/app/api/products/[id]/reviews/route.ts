@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { verifyToken } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Review from '@/models/Review';
@@ -12,6 +13,13 @@ export async function GET(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     // Verify product exists
     const product = await Product.findById(id);
@@ -56,6 +64,13 @@ export async function POST(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     // Verify authentication
     const authHeader = request.headers.get('authorization');
