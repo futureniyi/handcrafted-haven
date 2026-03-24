@@ -1,187 +1,247 @@
-# Design Decisions – Handcrafted Haven (Planning)
+# Handcrafted Haven Design & Styling Plan
 
-> Goal: Decide the visual style and user experience basics before building.  
-> This document is a planning guide and can be updated during the project.
+## 1. Brand Identity & Visual Direction
 
----
+**Primary Style Direction:**  
+Warm handmade marketplace with a clean, modern shopping experience.
 
-## 1) Brand & Mood
-**What should the website feel like?** (circle or write)
-- Warm / Handmade / Cozy
-- Clean / Modern / Minimal
-- Premium / Elegant
-- Fun / Colorful
+**Supporting Style:**  
+Minimal and user-friendly interface to ensure usability and clarity.
 
-**Short brand description (1–2 sentences):**  
--
+**Brand Personality:**  
+- Friendly  
+- Authentic  
+- Creative  
+- Trustworthy  
 
-**Target users:**
-- Shoppers (browse + buy handmade items)
-- Sellers (manage listings + profile)
-
----
-
-## 2) Color Palette
-**Primary color (main buttons/links):**  
-- Name:  (Indigo/Purple) – Used for main backgrounds, header, and footer.
-- Hex:  #483D8B
-
-**Secondary / Accent color (badges/highlights):**  
-- Name:  (Lavender) – Used for headings and link hover/active states.
-- Hex:  #E6E6FA 
-
-**Background color:**  
-- Hex:  
-
-**Text color:**  
-- Hex:  
-
-**Extra colors (optional):**
-- Success:  
-- Warning:  
-- Error:  
-
-**Accessibility check (WCAG):**
-- Primary text has good contrast on background: Yes / No  
-- Button text has good contrast on button color: Yes / No
+**Tone of Content:**  
+- Clear and conversational  
+- Welcoming and community-focused  
+- Simple and easy to understand  
 
 ---
 
-## 3) Typography
-**Main font (body text):**  
-- Montserrat – Used for headings and buttons
-- Lato – Used for body text and paragraphs
-- PT Serif – Used for quotes or special highlights (option
+## 2. Color Palette
 
-**Heading style:**
-- H1 size:  
-- H2 size:  
-- Weight:  
+**Primary Color:**  
+#483D8B (Indigo – trust and stability)
 
-**Body text size (default):**  
-- (example: 16px / 1rem)
+**Accent Color:**  
+#C78A5C (Muted clay/gold – warmth and handmade feel)
 
-**Line spacing (readability):**  
-- (example: 1.5)
+**Background Color:**  
+#FAF7F2 (Soft warm neutral)
 
----
+**Text Color:**  
+#2B2B2B (Dark grey for readability)
 
-## 4) Layout & Navigation (Structure, not a detailed sketch)
-**Main navigation items (top menu):**
-- Home
-- Catalog
-- Seller Profiles (optional)
-- Login / Register
-- Seller Dashboard (seller only)
+**Secondary Accent (optional):**  
+#E6E6FA (Lavender – light highlight use only)
 
-**Header includes:**
-- Logo / site name
-- Search (optional)
-- Login/User menu
-
-**Footer includes:**
-- About / Contact (optional)
-- Terms / Privacy (optional)
-- Social links (optional)
-
-**General page layout idea:**
-- Catalog uses a grid of product cards: Yes / No  
-- Filters appear: Left sidebar / Top bar / Collapsible on mobile
+https://coolors.co/483d8b-c78a5c-faf7f2-2b2b2b
 
 ---
 
-## 5) Core UI Components (Consistency)
-**Buttons**
-- Shape: Rounded / Slightly rounded / Square  
-- Primary button style:  
-- Secondary button style:  
+## 3. Typography
 
-**Cards**
-- Product card includes: image, title, price, rating, category  
-- Card style: border / shadow / both / none  
+**Headings:**  
+Montserrat (clean, modern, strong)
 
-**Forms**
-- Inputs have labels (not only placeholders): Yes / No  
-- Error messages style: short and clear
+**Body Text:**  
+Lato (high readability)
 
-**Icons**
-- Use icons? Yes / No  
-- Icon style: simple line icons / filled / mixed
+**Optional Accent Font (limited use only):**  
+PT Serif (for quotes or featured sections)
 
----
-
-## 6) Imagery & Graphics
-**Product images**
-- Aspect ratio: square / 4:3 / 16:9  
-- Image quality guideline: clear, good light, no huge file sizes
-
-**Brand visuals**
-- Logo: text-only / simple icon + text / TBD  
-- Hero image on home page: Yes / No / Later
+**Typography Rules:**  
+- Maximum of 2–3 fonts total  
+- Consistent heading hierarchy  
+- Line spacing optimized for readability  
+- Avoid decorative fonts in core UI  
 
 ---
 
-## 7) Responsive Design Rules
-**Breakpoints (basic):**
-- Mobile
-- Tablet
-- Desktop
+## 4. Layout & Structure
 
-**Mobile-first decisions:**
-- Navigation becomes hamburger menu on mobile: Yes / No  
-- Filters become collapsible on mobile: Yes / No  
-- Cards per row:
-  - Mobile: 1
-  - Tablet: 2
-  - Desktop: 3–4
+**Layout Style:**  
+Clean, grid-based layout with generous whitespace.
 
----
+**Page Structure:**  
+- Header (logo + navigation)  
+- Hero section (homepage only)  
+- Main content  
+- Footer  
 
-## 8) Accessibility (WCAG 2.1 AA Basics)
-Checklist:
-- Keyboard navigation works on all pages
-- Focus indicator is visible
-- Labels for all form fields
-- Alt text for images
-- Color contrast checked
-- Buttons/links have clear names (not “click here”)
-
-Notes / decisions:
--
+**Spacing Guidelines:**  
+- Consistent padding (16px, 24px, 32px scale)  
+- Clear separation between sections  
+- Avoid clutter  
 
 ---
 
-## 9) SEO & Usability Basics
-**SEO**
-- Each page has a clear title
-- Good heading structure (H1, H2, H3)
-- Clean URLs (e.g., `/products/123`)
+## 5. Navigation Design
 
-**Usability**
-- Clear calls-to-action (“Add Product”, “Write a Review”)
-- Helpful empty states (e.g., “No products found”)
-- Friendly error messages
+**Primary Navigation (Public):**  
+- Home  
+- Shop / Catalog  
+- Sellers  
+- About  
+- Login  
 
-Notes / decisions:
--
+**Post-login Navigation (Seller):**  
+- Dashboard  
+- Manage Products  
+- Orders  
+
+**Navigation Behavior:**  
+- Sticky header  
+- Clear hover states  
+- Mobile hamburger menu  
 
 ---
 
-## 10) Final Decisions (Summary)
-**Final mood/style chosen:**  
--
+## 6. Core Components
 
-**Final colors chosen (hex):**
-- Primary:
-- Accent:
-- Background:
-- Text:
+### Buttons
+- Slightly rounded corners  
+- Clear hover and active states  
+- Primary and secondary button styles  
 
-**Final font chosen:**  
--
+### Product Cards
+- Square image ratio  
+- Soft shadow  
+- Thin border  
+- Display: image, name, price, rating  
 
-**Navigation items confirmed:**  
--
+### Forms
+- Labels above inputs  
+- Clear validation messages  
+- Consistent spacing  
 
-**Anything still TBD:**  
--
+### Icons
+- Simple line icons  
+- Minimal and consistent style  
+
+---
+
+## 7. Homepage Design
+
+**Hero Section:**  
+- Warm headline  
+- Supporting text  
+- Call-to-action button  
+
+**Sections:**  
+- Featured categories  
+- Featured artisans  
+- Popular / newest products  
+- Community/trust section  
+
+---
+
+## 8. Catalog & Product Experience
+
+**Catalog Page:**  
+- Grid layout  
+- Filters (category, price, rating)  
+- Sort options  
+
+**Product Page:**  
+- Large product image  
+- Description  
+- Price  
+- Reviews  
+- Add to cart  
+
+---
+
+## 9. Seller Experience
+
+**Seller Profiles:**  
+- Profile image  
+- Bio  
+- Product listings  
+
+**Seller Dashboard:**  
+- Add/edit products  
+- Manage orders  
+- View performance  
+
+---
+
+## 10. Responsive Design
+
+**Breakpoints:**  
+- Mobile  
+- Tablet  
+- Desktop  
+
+**Mobile Design Rules:**  
+- Stack layout vertically  
+- Larger tap targets  
+- Simplified navigation  
+
+---
+
+## 11. Accessibility
+
+**Standards:**  
+- High color contrast  
+- Keyboard navigation supported  
+- Visible focus states  
+- Alt text for all images  
+
+**Implementation:**  
+- Test contrast before submission  
+- Ensure all buttons are reachable via keyboard  
+- Use semantic HTML  
+
+---
+
+## 12. SEO & Performance
+
+**SEO:**  
+- Descriptive page titles  
+- Meta descriptions  
+- Proper heading hierarchy  
+- Alt text for images  
+
+**Performance:**  
+- Optimized images  
+- Minimal CSS and JS  
+- Fast load times  
+
+---
+
+## 13. Content Guidelines
+
+**Voice:**  
+- Friendly and human  
+- Clear and direct  
+
+**Product Descriptions:**  
+- Short summary first  
+- Details after  
+
+**Seller Content:**  
+- Authentic storytelling  
+- Focus on craftsmanship  
+
+---
+
+## 14. Final Design Decisions Summary
+
+- Warm handmade + clean modern design direction  
+- Indigo + clay + warm neutral palette  
+- Montserrat + Lato typography  
+- Grid-based layout with strong spacing  
+- Simplified navigation structure  
+- Defined reusable UI components  
+- Responsive and accessible by default  
+- SEO and performance considered from the start  
+
+---
+
+## 15. Conclusion
+
+This design plan ensures consistency across the Handcrafted Haven platform while supporting usability, accessibility, and a strong brand identity. It provides a clear foundation for development and collaboration across the team.

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { verifyToken } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
@@ -12,6 +13,13 @@ export async function GET(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     const product = await Product.findById(id)
       .populate('sellerId', 'name bio story');
@@ -41,6 +49,13 @@ export async function PUT(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     // Verify authentication
     const authHeader = request.headers.get('authorization');
@@ -105,54 +120,55 @@ export async function PUT(
       updateData.name = updateData.name.trim();
     }
 
-    if (updateData.description !== undefined) {
-      if (typeof updateData.description !== 'string' || updateData.description.trim().length === 0) {
-        return NextResponse.json(
-          { error: 'Description must be a non-empty string' },
-          { status: 400 }
-        );
-      }
-      if (updateData.description.length > 1000) {
-        return NextResponse.json(
-          { error: 'Description must be less than 1000 characters' },
-          { status: 400 }
-        );
-      }
-      updateData.description = updateData.description.trim();
-    }
+if (updateData.description !== undefined) {
+  if (typeof updateData.description !== 'string' || updateData.description.trim().length === 0) {
+    return NextResponse.json(
+      { error: 'Description must be a non-empty string' },
+      { status: 400 }
+    );
+  }
+  if (updateData.description.length > 1000) {
+    return NextResponse.json(
+      { error: 'Description must be less than 1000 characters' },
+      { status: 400 }
+    );
+  }
+  updateData.description = updateData.description.trim();
+}
 
-    if (updateData.price !== undefined) {
-      if (typeof updateData.price !== 'number' || isNaN(updateData.price) || updateData.price < 0) {
-        return NextResponse.json(
-          { error: 'Price must be a non-negative number' },
-          { status: 400 }
-        );
-      }
-    }
+if (updateData.price !== undefined) {
+  if (typeof updateData.price !== 'number' || isNaN(updateData.price) || updateData.price < 0) {
+    return NextResponse.json(
+      { error: 'Price must be a non-negative number' },
+      { status: 400 }
+    );
+  }
+}
 
-    if (updateData.category !== undefined) {
-      if (!['jewelry', 'clothing', 'home-decor', 'art', 'other'].includes(updateData.category)) {
-        return NextResponse.json(
-          { error: 'Category must be one of: jewelry, clothing, home-decor, art, other' },
-          { status: 400 }
-        );
-      }
-    }
+if (updateData.category !== undefined) {
+  if (!['jewelry', 'clothing', 'home-decor', 'art', 'other'].includes(updateData.category)) {
+    return NextResponse.json(
+      { error: 'Category must be one of: jewelry, clothing, home-decor, art, other' },
+      { status: 400 }
+    );
+  }
+}
 
-    if (updateData.images !== undefined) {
-      if (!Array.isArray(updateData.images)) {
-        return NextResponse.json(
-          { error: 'Images must be an array of URLs' },
-          { status: 400 }
-        );
-      }
-      if (updateData.images.some((img: any) => typeof img !== 'string' || !/^https?:\/\/.+/.test(img))) {
-        return NextResponse.json(
-          { error: 'All images must be valid HTTP/HTTPS URLs' },
-          { status: 400 }
-        );
-      }
-    }
+if (updateData.images !== undefined) {
+  if (!Array.isArray(updateData.images)) {
+    return NextResponse.json(
+      { error: 'Images must be an array of URLs' },
+      { status: 400 }
+    );
+  }
+  if (updateData.images.some((img: any) => typeof img !== 'string' || !/^https?:\/\/.+/.test(img))) {
+    return NextResponse.json(
+      { error: 'All images must be valid HTTP/HTTPS URLs' },
+      { status: 400 }
+    );
+  }
+}
+    
 
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
@@ -178,6 +194,13 @@ export async function DELETE(
     await dbConnect();
 
     const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid product id' },
+        { status: 400 }
+      );
+    }
 
     // Verify authentication
     const authHeader = request.headers.get('authorization');

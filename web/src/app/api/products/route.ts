@@ -58,20 +58,14 @@ export async function POST(request: NextRequest) {
     // Verify authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'No token provided' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'No token provided' }, { status: 401 });
     }
 
     const token = authHeader.substring(7);
     const decoded = verifyToken(token);
 
     if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
     // Ensure the user is a seller
@@ -143,19 +137,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const parsedPrice = Number(price);
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+      return NextResponse.json({ error: 'Invalid price' }, { status: 400 });
+    }
+
+    const allowedCategories = ['jewelry', 'clothing', 'home-decor', 'art', 'other'];
+    if (!allowedCategories.includes(String(category))) {
+      return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
+    }
+
+    const safeImages = Array.isArray(images) ? images : [];
+    if (safeImages.length > 5) {
+      return NextResponse.json({ error: 'Max 5 images allowed' }, { status: 400 });
+    }
+
     const newProduct = await Product.create({
       sellerId: user._id,
-      name: name.trim(),
-      description: description.trim(),
-      price,
+      name,
+      description,
+      price: parsedPrice,
       category,
-      images: Array.isArray(images) ? images : [],
+      images: safeImages,
       inStock: inStock !== undefined ? Boolean(inStock) : true,
     });
 
     return NextResponse.json(newProduct, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating product:', error);
+
+    if (error?.name === 'ValidationError') {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
