@@ -80,9 +80,59 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, description, price, category, images, inStock } = body;
 
-    if (!name || !description || price === undefined || !category) {
+    // Validation
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Name is required and must be a non-empty string' },
+        { status: 400 }
+      );
+    }
+
+    if (name.length > 100) {
+      return NextResponse.json(
+        { error: 'Name must be less than 100 characters' },
+        { status: 400 }
+      );
+    }
+
+    if (!description || typeof description !== 'string' || description.trim().length === 0) {
+      return NextResponse.json(
+        { error: 'Description is required and must be a non-empty string' },
+        { status: 400 }
+      );
+    }
+
+    if (description.length > 1000) {
+      return NextResponse.json(
+        { error: 'Description must be less than 1000 characters' },
+        { status: 400 }
+      );
+    }
+
+    if (typeof price !== 'number' || isNaN(price) || price < 0) {
+      return NextResponse.json(
+        { error: 'Price must be a non-negative number' },
+        { status: 400 }
+      );
+    }
+
+    if (!category || !['jewelry', 'clothing', 'home-decor', 'art', 'other'].includes(category)) {
+      return NextResponse.json(
+        { error: 'Category must be one of: jewelry, clothing, home-decor, art, other' },
+        { status: 400 }
+      );
+    }
+
+    if (images && !Array.isArray(images)) {
+      return NextResponse.json(
+        { error: 'Images must be an array of URLs' },
+        { status: 400 }
+      );
+    }
+
+    if (images && images.some((img: any) => typeof img !== 'string' || !/^https?:\/\/.+/.test(img))) {
+      return NextResponse.json(
+        { error: 'All images must be valid HTTP/HTTPS URLs' },
         { status: 400 }
       );
     }
