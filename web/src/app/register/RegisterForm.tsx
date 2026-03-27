@@ -56,8 +56,14 @@ export default function RegisterForm() {
       window.localStorage.setItem("token", data.token);
       window.localStorage.setItem("user", JSON.stringify(data.user));
 
-      setSuccess("Registration successful. Redirecting to the catalog...");
-      router.push("/catalog");
+      const nextPath = data.user.role === "seller" ? "/dashboard" : "/catalog";
+
+      setSuccess(
+        `Registration successful. Redirecting to ${
+          data.user.role === "seller" ? "your dashboard" : "the catalog"
+        }...`,
+      );
+      router.push(nextPath);
       router.refresh();
     } catch (submitError) {
       setError(

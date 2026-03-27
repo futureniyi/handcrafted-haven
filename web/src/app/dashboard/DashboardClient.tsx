@@ -37,40 +37,54 @@ export default function DashboardClient() {
             No products yet. Create your first mock listing to test the seller flow.
           </div>
         ) : (
-          <div className={styles.productList}>
+          <div className={`${styles.productList} ${styles.productListRows}`}>
             {products.map((product) => (
-              <article className={styles.productCard} key={product.id}>
-                <div className={styles.productHeader}>
-                  <div>
-                    <h3 className={styles.productName}>{product.name}</h3>
-                    <p className={styles.helperText}>
-                      {product.inStock ? "In stock" : "Out of stock"}
-                    </p>
+              <article className={`${styles.productCard} ${styles.productCardListView}`} key={product.id}>
+                <div className={`${styles.imageFrame} ${styles.imageFrameList}`}>
+                  {product.imageUrl ? (
+                    <img
+                      alt={product.name}
+                      className={styles.image}
+                      src={product.imageUrl}
+                    />
+                  ) : (
+                    <span className={styles.imageFallback}>No image preview available</span>
+                  )}
+                </div>
+
+                <div className={styles.productBody}>
+                  <div className={styles.productHeader}>
+                    <div>
+                      <h3 className={styles.productName}>{product.name}</h3>
+                      <p className={styles.helperText}>
+                        {product.inStock ? "In stock" : "Out of stock"}
+                      </p>
+                    </div>
+                    <span className={styles.badge}>{formatCategory(product.category)}</span>
                   </div>
-                  <span className={styles.badge}>{formatCategory(product.category)}</span>
-                </div>
 
-                <div className={styles.metaRow}>
-                  <span>${product.price}</span>
-                  <span>{product.imageUrl || "No image URL yet"}</span>
-                </div>
+                  <div className={styles.metaRow}>
+                    <span>${product.price}</span>
+                    <span>{product.inStock ? "Ready to sell" : "Currently unavailable"}</span>
+                  </div>
 
-                <p className={styles.description}>{product.description}</p>
+                  <p className={styles.description}>{product.description}</p>
 
-                <div className={styles.cardActions}>
-                  <Link
-                    className={styles.button}
-                    href={`/dashboard/products/${product.id}/edit`}
-                  >
-                    Edit Product
-                  </Link>
-                  <button
-                    className={styles.secondaryButton}
-                    type="button"
-                    onClick={() => deleteProduct(product.id)}
-                  >
-                    Remove Mock Product
-                  </button>
+                  <div className={styles.cardActions}>
+                    <Link
+                      className={styles.button}
+                      href={`/dashboard/products/${product.id}/edit`}
+                    >
+                      Edit Product
+                    </Link>
+                    <button
+                      className={styles.secondaryButton}
+                      type="button"
+                      onClick={() => deleteProduct(product.id)}
+                    >
+                      Remove Mock Product
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

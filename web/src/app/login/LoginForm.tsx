@@ -52,8 +52,14 @@ export default function LoginForm() {
       window.localStorage.setItem("token", data.token);
       window.localStorage.setItem("user", JSON.stringify(data.user));
 
-      setSuccess("Login successful. Redirecting to the catalog...");
-      router.push("/catalog");
+      const nextPath = data.user.role === "seller" ? "/dashboard" : "/catalog";
+
+      setSuccess(
+        `Login successful. Redirecting to ${
+          data.user.role === "seller" ? "your dashboard" : "the catalog"
+        }...`,
+      );
+      router.push(nextPath);
       router.refresh();
     } catch (submitError) {
       setError(

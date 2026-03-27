@@ -42,6 +42,10 @@ const defaultFilters: ProductFilters = {
   maxPrice: "",
 };
 
+function hasActiveFilters(filters: ProductFilters) {
+  return Boolean(filters.category || filters.minPrice || filters.maxPrice);
+}
+
 function buildProductQueryParams(filters: ProductFilters) {
   const params = new URLSearchParams({
     limit: "100",
@@ -131,6 +135,14 @@ export default function CatalogClient() {
     setAppliedFilters(defaultFilters);
   }
 
+  const activeFilters = [
+    draftFilters.category
+      ? categoryOptions.find((category) => category.value === draftFilters.category)?.label
+      : null,
+    draftFilters.minPrice ? `Min $${draftFilters.minPrice}` : null,
+    draftFilters.maxPrice ? `Max $${draftFilters.maxPrice}` : null,
+  ].filter(Boolean);
+
   return (
     <main className={styles.main}>
       <h1>Catalog</h1>
@@ -140,28 +152,51 @@ export default function CatalogClient() {
       </p>
 
       <form className={styles.filters} onSubmit={handleApplyFilters}>
-        <h2 className={styles.filtersTitle}>Filter products</h2>
+        <div className={styles.filtersHeader}>
+          <div>
+            <h2 className={styles.filtersTitle}>Shop by filter</h2>
+            <p className={styles.filtersText}>
+              Narrow the catalog by category or price range, then apply the filters to
+              refresh the product grid.
+            </p>
+          </div>
+          {hasActiveFilters(draftFilters) && (
+            <button
+              className={styles.inlineClear}
+              type="button"
+              onClick={handleClearFilters}
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+
+        <div className={styles.filterSection}>
+          <label className={styles.label}>Category</label>
+          <div className={styles.categoryChips} role="group" aria-label="Filter by category">
+            <button
+              className={`${styles.chip} ${draftFilters.category === "" ? styles.chipActive : ""}`}
+              type="button"
+              onClick={() => updateDraftFilter("category", "")}
+            >
+              All
+            </button>
+            {categoryOptions.map((category) => (
+              <button
+                key={category.value}
+                className={`${styles.chip} ${
+                  draftFilters.category === category.value ? styles.chipActive : ""
+                }`}
+                type="button"
+                onClick={() => updateDraftFilter("category", category.value)}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className={styles.filterGrid}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="category">
-              Category
-            </label>
-            <select
-              id="category"
-              className={styles.select}
-              value={draftFilters.category}
-              onChange={(event) => updateDraftFilter("category", event.target.value)}
-            >
-              <option value="">All categories</option>
-              {categoryOptions.map((category) => (
-                <option key={category.value} value={category.value}>
-                  {category.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className={styles.field}>
             <label className={styles.label} htmlFor="min-price">
               Min price
@@ -197,16 +232,31 @@ export default function CatalogClient() {
           </div>
         </div>
 
-        <div className={styles.actions}>
+        <div className={styles.actionsRow}>
+          <div className={styles.activePills} aria-live="polite">
+            {activeFilters.length > 0 ? (
+              activeFilters.map((filter) => (
+                <span className={styles.activePill} key={filter}>
+                  {filter}
+                </span>
+              ))
+            ) : (
+              <span className={styles.activeHint}>No filters selected</span>
+            )}
+          </div>
+
+          <div className={styles.actions}>
+            <button
+              className={`${styles.button} ${styles.secondaryButton}`}
+              type="button"
+              onClick={handleClearFilters}
+            >
+              Clear Filters
+            </button>
+          </div>
+
           <button className={styles.button} type="submit">
             Apply Filters
-          </button>
-          <button
-            className={`${styles.button} ${styles.secondaryButton}`}
-            type="button"
-            onClick={handleClearFilters}
-          >
-            Clear Filters
           </button>
         </div>
       </form>
@@ -218,9 +268,11 @@ export default function CatalogClient() {
       {!loading && !error && products.length === 0 && <p>No products found.</p>}
 
       {!loading && !error && products.length > 0 && (
-        <p className={styles.resultsSummary}>
-          Showing {products.length} of {totalProducts} products.
-        </p>
+        <div className={styles.resultsBar}>
+          <p className={styles.resultsSummary}>
+            Showing {products.length} of {totalProducts} products.
+          </p>
+        </div>
       )}
 
       {!loading && !error && products.length > 0 && (
