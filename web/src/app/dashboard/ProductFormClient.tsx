@@ -32,8 +32,9 @@ function isProductCategory(value: string): value is ProductCategory {
 }
 
 function mapProductToForm(product: ProductApiResponse): ProductFormState {
-  const category = isProductCategory(product.category || "")
-    ? product.category
+  const rawCategory = product.category ?? "";
+  const category: ProductCategory = isProductCategory(rawCategory)
+    ? rawCategory
     : "other";
 
   return {
