@@ -4,6 +4,8 @@ import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import styles from "./page.module.css";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sellers",
   description:
