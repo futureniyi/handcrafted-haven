@@ -1,0 +1,126 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+}
+
+.inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: center;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0.8rem 1rem;
+}
+
+.topRow {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.brand {
+  color: #0f172a;
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.menuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.22rem;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #dbe4ee;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.menuLine {
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: #0f172a;
+}
+
+.nav {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.link,
+.authButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  transition: background-color 120ms ease, color 120ms ease;
+  cursor: pointer;
+}
+
+.link:hover,
+.authButton:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.active {
+  background: #0f172a;
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .topRow {
+    justify-content: space-between;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+
+  .nav {
+    display: none;
+    width: 100%;
+    gap: 0.45rem;
+    padding: 0.85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #fff;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navOpen {
+    display: flex;
+  }
+
+  .link,
+  .authButton {
+    width: 100%;
+  }
+}

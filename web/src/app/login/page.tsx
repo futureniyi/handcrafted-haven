@@ -1,14 +1,12 @@
+import type { Metadata } from "next";
+import LoginForm from "./LoginForm";
+
+export const metadata: Metadata = {
+  title: "Login",
+  description:
+    "Sign in to Handcrafted Haven to manage your artisan account, storefront, and handmade product listings.",
+};
+
 export default function LoginPage() {
-  return (
-    <main style={{ padding: "2rem 1rem", maxWidth: 520, margin: "0 auto" }}>
-      <h1>Login</h1>
-      <p>Coming soon: login form.</p>
-      <p>
-        <a href="/register">Go to Register →</a>
-      </p>
-      <p>
-        <a href="/">← Back to Home</a>
-      </p>
-    </main>
-  );
+  return <LoginForm />;
 }

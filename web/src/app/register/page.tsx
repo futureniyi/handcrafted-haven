@@ -1,14 +1,12 @@
+import type { Metadata } from "next";
+import RegisterForm from "./RegisterForm";
+
+export const metadata: Metadata = {
+  title: "Register",
+  description:
+    "Create a Handcrafted Haven account to start buying handmade products or set up your artisan seller profile.",
+};
+
 export default function RegisterPage() {
-  return (
-    <main style={{ padding: "2rem 1rem", maxWidth: 520, margin: "0 auto" }}>
-      <h1>Register</h1>
-      <p>Coming soon: registration form.</p>
-      <p>
-        <a href="/login">Go to Login →</a>
-      </p>
-      <p>
-        <a href="/">← Back to Home</a>
-      </p>
-    </main>
-  );
+  return <RegisterForm />;
 }

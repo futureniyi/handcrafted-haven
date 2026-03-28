@@ -1,11 +1,144 @@
-export default function ProductDetailPage() {
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import dbConnect from "@/lib/mongodb";
+import Product from "@/models/Product";
+import ReviewsSection from "./ReviewsSection";
+import styles from "./page.module.css";
+
+type ProductDetailPageProps = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+type ProductPageData = {
+  id: string;
+  name: string;
+  description: string;
+  price: number | null;
+  category: string;
+  images: string[];
+  seller: {
+    id: string;
+    name: string;
+  } | null;
+};
+
+function formatCategory(category: string) {
+  return category
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+async function getProduct(id: string): Promise<ProductPageData | null> {
+  await dbConnect();
+
+  const product = await Product.findById(id).populate("sellerId", "name");
+
+  if (!product) {
+    return null;
+  }
+
+  return {
+    id: product._id.toString(),
+    name: product.name || "Unnamed product",
+    description: product.description || "No description available.",
+    price: typeof product.price === "number" ? product.price : null,
+    category: product.category || "other",
+    images: Array.isArray(product.images) ? product.images : [],
+    seller: product.sellerId
+      ? {
+          id: product.sellerId._id.toString(),
+          name: product.sellerId.name || "Seller",
+        }
+      : null,
+  };
+}
+
+export async function generateMetadata({
+  params,
+}: ProductDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+      description: "This handmade product could not be found on Handcrafted Haven.",
+    };
+  }
+
+  return {
+    title: product.name,
+    description: product.description,
+  };
+}
+
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    notFound();
+  }
+
   return (
-    <main style={{ padding: "2rem 1rem", maxWidth: 980, margin: "0 auto" }}>
-      <h1>Product Details</h1>
-      <p>Coming soon: product image, price, description, seller info, reviews.</p>
-      <p>
-        <a href="/catalog">← Back to Catalog</a>
-      </p>
+    <main className={styles.main}>
+      <Link className={styles.backLink} href="/catalog">
+        ← Back to Catalog
+      </Link>
+
+      <section className={styles.layout}>
+        <div className={styles.gallery}>
+          <div className={styles.imageFrame}>
+            {product.images.length > 0 ? (
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className={styles.image}
+              />
+            ) : (
+              <span className={styles.imageFallback}>No product image available.</span>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.panel}>
+          <p className={styles.category}>{formatCategory(product.category)}</p>
+          <h1 className={styles.title}>{product.name}</h1>
+          <p className={styles.price}>
+            {product.price !== null ? `$${product.price.toFixed(2)}` : "Price unavailable"}
+          </p>
+
+          <section>
+            <h2 className={styles.sectionTitle}>Description</h2>
+            <p className={styles.description}>{product.description}</p>
+          </section>
+
+          <section className={styles.sellerBlock}>
+            <h2 className={styles.sectionTitle}>Seller</h2>
+            {product.seller ? (
+              <>
+                <p className={styles.sellerName}>{product.seller.name}</p>
+                <Link
+                  className={styles.sellerLink}
+                  href={`/sellers/${product.seller.id}`}
+                >
+                  View seller profile
+                </Link>
+              </>
+            ) : (
+              <p className={styles.description}>Seller information is unavailable.</p>
+            )}
+          </section>
+        </div>
+      </section>
+
+      <ReviewsSection productId={product.id} />
     </main>
   );
 }
