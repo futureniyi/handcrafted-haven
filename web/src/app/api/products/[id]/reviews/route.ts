@@ -117,18 +117,48 @@ export async function POST(
     const body = await request.json();
     const { rating, comment } = body;
 
-    if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
+    // Validate rating
+    if (rating === undefined || rating === null) {
       return NextResponse.json(
-        { error: 'Rating must be a number between 1 and 5' },
+        { error: 'Rating is required' },
         { status: 400 }
       );
     }
 
-    if (comment && comment.length > 500) {
+    if (typeof rating !== 'number' || !Number.isInteger(rating)) {
       return NextResponse.json(
-        { error: 'Comment must be less than 500 characters' },
+        { error: 'Rating must be an integer' },
         { status: 400 }
       );
+    }
+
+    if (rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { error: 'Rating must be between 1 and 5' },
+        { status: 400 }
+      );
+    }
+
+    // Validate comment if provided
+    if (comment !== undefined && comment !== null) {
+      if (typeof comment !== 'string') {
+        return NextResponse.json(
+          { error: 'Comment must be a string' },
+          { status: 400 }
+        );
+      }
+      if (comment.trim().length === 0 && comment.length > 0) {
+        return NextResponse.json(
+          { error: 'Comment cannot be whitespace only' },
+          { status: 400 }
+        );
+      }
+      if (comment.length > 500) {
+        return NextResponse.json(
+          { error: 'Comment must be less than 500 characters' },
+          { status: 400 }
+        );
+      }
     }
 
     // Create review

@@ -11,8 +11,20 @@ export async function POST(request: NextRequest) {
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
 
+    // Validate required fields
     if (!email || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+    }
+
+    // Validate password is not empty
+    if (password.length === 0) {
+      return NextResponse.json({ error: "Password cannot be empty" }, { status: 400 });
     }
 
     const user = await User.findOne({ email });
