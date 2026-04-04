@@ -6,13 +6,7 @@ import Link from "next/link";
 import { getProductImageSrc } from "@/src/lib/product-image";
 import styles from "./DashboardClient.module.css";
 import { formatCategory, type ProductCategory } from "./dashboard-data";
-
-type StoredUser = {
-  id?: string;
-  email?: string;
-  name?: string;
-  role?: string;
-};
+import { useSession } from "../SessionProvider";
 
 type SellerRef =
   | string
@@ -40,16 +34,6 @@ type ProductsResponse = {
   error?: string;
 };
 
-function getStoredUser(): StoredUser | null {
-  try {
-    const raw = window.localStorage.getItem("user");
-    if (!raw) return null;
-    return JSON.parse(raw) as StoredUser;
-  } catch {
-    return null;
-  }
-}
-
 function getSellerId(value: SellerRef): string {
   if (!value) return "";
   if (typeof value === "string") return value;
@@ -57,6 +41,7 @@ function getSellerId(value: SellerRef): string {
 }
 
 export default function DashboardClient() {
+  const { session } = useSession();
   const [products, setProducts] = useState<DashboardProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -69,9 +54,7 @@ export default function DashboardClient() {
         setErrorMessage("");
         setSuccessMessage("");
 
-        const storedUser = getStoredUser();
-
-        if (!storedUser || storedUser.role !== "seller" || !storedUser.id) {
+        if (session?.user.role !== "seller" || !session.user.id) {
           setErrorMessage("Please log in as a seller to manage products.");
           setProducts([]);
           return;
@@ -90,7 +73,7 @@ export default function DashboardClient() {
         const allProducts = Array.isArray(data.products) ? data.products : [];
 
         const sellerProducts = allProducts.filter(
-          (product) => getSellerId(product.sellerId) === storedUser.id,
+          (product) => getSellerId(product.sellerId) === session.user.id,
         );
 
         setProducts(sellerProducts);
@@ -106,7 +89,7 @@ export default function DashboardClient() {
     }
 
     loadProducts();
-  }, []);
+  }, [session]);
 
   async function handleDelete(productId: string) {
     const confirmed = window.confirm(
@@ -121,7 +104,7 @@ export default function DashboardClient() {
       setErrorMessage("");
       setSuccessMessage("");
 
-      const token = window.localStorage.getItem("token");
+      const token = session?.token;
 
       if (!token) {
         setErrorMessage("Please log in again before deleting a product.");

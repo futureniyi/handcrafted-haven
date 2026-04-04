@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
-import { generateToken, comparePassword } from "@/lib/auth";
+import {
+  AUTH_COOKIE_NAME,
+  comparePassword,
+  generateToken,
+  getAuthCookieOptions,
+} from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,10 +48,13 @@ export async function POST(request: NextRequest) {
       role: user.role,
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       token,
       user: { id: user._id.toString(), email: user.email, name: user.name, role: user.role },
     });
+
+    response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
+    return response;
   } catch (err) {
     console.error("Login error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

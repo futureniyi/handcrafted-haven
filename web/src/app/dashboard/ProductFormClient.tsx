@@ -11,6 +11,7 @@ import {
   type ProductCategory,
   type ProductFormState,
 } from "./dashboard-data";
+import { useSession } from "../SessionProvider";
 
 type ProductFormClientProps = {
   mode: "create" | "edit";
@@ -64,6 +65,7 @@ export default function ProductFormClient({
   productId,
 }: ProductFormClientProps) {
   const router = useRouter();
+  const { session } = useSession();
 
   const [form, setForm] = useState<ProductFormState>(defaultFormState);
   const [initialForm, setInitialForm] = useState<ProductFormState>(defaultFormState);
@@ -139,7 +141,7 @@ export default function ProductFormClient({
       return;
     }
 
-    const token = window.localStorage.getItem("token");
+    const token = session?.token;
 
     if (!token) {
       setErrorMessage("Please log in as a seller before uploading an image.");
@@ -214,7 +216,7 @@ export default function ProductFormClient({
       setErrorMessage("");
       setStatusMessage("");
 
-      const token = window.localStorage.getItem("token");
+      const token = session?.token;
 
       if (!token) {
         setErrorMessage("Please log in as a seller before saving a product.");

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { getRequestSession } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
-import User from '@/models/User';
 
 export async function GET(request: NextRequest) {
   try {
@@ -61,22 +60,12 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
 
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+    const session = await getRequestSession(request);
+    if (!session) {
+      return NextResponse.json({ error: 'Please log in to continue' }, { status: 401 });
     }
 
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-    }
-
-    // Ensure the user is a seller
-    const user = await User.findById(decoded.userId);
-    if (!user || user.role !== 'seller') {
+    if (session.user.role !== 'seller') {
       return NextResponse.json(
         { error: 'Only sellers can create products' },
         { status: 403 }
@@ -159,7 +148,7 @@ export async function POST(request: NextRequest) {
     }
 
     const newProduct = await Product.create({
-      sellerId: user._id,
+      sellerId: session.user.id,
       name,
       description,
       price: parsedPrice,

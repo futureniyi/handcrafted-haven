@@ -7,6 +7,7 @@ import styles from "./DashboardShell.module.css";
 const dashboardLinks = [
   { href: "/dashboard", label: "My Products" },
   { href: "/dashboard/products/new", label: "Add Product" },
+  { href: "/dashboard/profile", label: "Edit Profile" },
 ];
 
 function isActive(pathname: string, href: string) {

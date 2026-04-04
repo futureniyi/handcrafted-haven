@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import styles from "./page.module.css";
+import { useSession } from "../../SessionProvider";
 
 type ReviewAuthor = {
   _id?: string;
@@ -27,6 +28,7 @@ type ReviewsResponse = {
 
 type ReviewsSectionProps = {
   productId: string;
+  sellerId: string;
 };
 
 type ReviewForm = {
@@ -60,7 +62,11 @@ function renderStars(rating: number) {
   return "★".repeat(rating) + "☆".repeat(5 - rating);
 }
 
-export default function ReviewsSection({ productId }: ReviewsSectionProps) {
+export default function ReviewsSection({
+  productId,
+  sellerId,
+}: ReviewsSectionProps) {
+  const { session } = useSession();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -69,6 +75,7 @@ export default function ReviewsSection({ productId }: ReviewsSectionProps) {
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<ReviewForm>(defaultForm);
+  const isProductOwner = session?.user.role === "seller" && session.user.id === sellerId;
 
   const loadReviews = useCallback(async () => {
     try {
@@ -120,10 +127,15 @@ export default function ReviewsSection({ productId }: ReviewsSectionProps) {
       setSubmitting(true);
       setSubmitError("");
 
-      const token = window.localStorage.getItem("token");
+      const token = session?.token;
 
       if (!token) {
         setSubmitError("Please log in to submit a review.");
+        return;
+      }
+
+      if (isProductOwner) {
+        setSubmitError("You cannot review your own product.");
         return;
       }
 
@@ -234,7 +246,9 @@ export default function ReviewsSection({ productId }: ReviewsSectionProps) {
         <div className={styles.reviewFormBlock}>
           <h3 className={styles.reviewSectionHeading}>Leave a review</h3>
           <p className={styles.reviewHelper}>
-            Use a 1 to 5 rating and share a short comment about the product.
+            {isProductOwner
+              ? "This is your product, so reviews are disabled for the owner."
+              : "Use a 1 to 5 rating and share a short comment about the product."}
           </p>
 
           <form className={styles.reviewForm} onSubmit={handleSubmit}>
@@ -247,6 +261,7 @@ export default function ReviewsSection({ productId }: ReviewsSectionProps) {
                 className={styles.reviewSelect}
                 value={form.rating}
                 onChange={(event) => updateForm("rating", event.target.value)}
+                disabled={isProductOwner || submitting}
               >
                 <option value="5">5 - Excellent</option>
                 <option value="4">4 - Very good</option>
@@ -267,13 +282,22 @@ export default function ReviewsSection({ productId }: ReviewsSectionProps) {
                 maxLength={500}
                 placeholder="Share what you liked, how it arrived, or who you would recommend it to."
                 onChange={(event) => updateForm("comment", event.target.value)}
+                disabled={isProductOwner || submitting}
               />
             </div>
 
             {submitError && <p className={styles.reviewError}>{submitError}</p>}
 
-            <button className={styles.reviewButton} disabled={submitting} type="submit">
-              {submitting ? "Submitting..." : "Submit Review"}
+            <button
+              className={styles.reviewButton}
+              disabled={isProductOwner || submitting}
+              type="submit"
+            >
+              {isProductOwner
+                ? "Owners Cannot Review"
+                : submitting
+                  ? "Submitting..."
+                  : "Submit Review"}
             </button>
           </form>
         </div>

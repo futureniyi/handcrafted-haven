@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import styles from "./AppHeader.module.css";
+import { useSession } from "./SessionProvider";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -22,26 +23,11 @@ function isActive(pathname: string, href: string) {
 export default function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { clearSession, isAuthenticated, isSeller } = useSession();
 
-  useEffect(() => {
-    function syncAuthState() {
-      setIsLoggedIn(Boolean(window.localStorage.getItem("token")));
-    }
-
-    syncAuthState();
-    window.addEventListener("storage", syncAuthState);
-
-    return () => {
-      window.removeEventListener("storage", syncAuthState);
-    };
-  }, []);
-
-  function handleLogout() {
-    window.localStorage.removeItem("token");
-    window.localStorage.removeItem("user");
-    setIsLoggedIn(false);
+  async function handleLogout() {
+    await clearSession();
     setIsMenuOpen(false);
     router.push("/login");
     router.refresh();
@@ -85,18 +71,37 @@ export default function AppHeader() {
             </Link>
           ))}
 
-          {isLoggedIn ? (
+          {isSeller ? (
+            <Link
+              className={`${styles.link} ${isActive(pathname, "/dashboard") ? styles.active : ""}`}
+              href="/dashboard"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+          ) : null}
+
+          {isAuthenticated ? (
             <button className={styles.authButton} onClick={handleLogout} type="button">
               Logout
             </button>
           ) : (
-            <Link
-              className={`${styles.link} ${isActive(pathname, "/login") ? styles.active : ""}`}
-              href="/login"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Login
-            </Link>
+            <>
+              <Link
+                className={`${styles.link} ${isActive(pathname, "/login") ? styles.active : ""}`}
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                className={`${styles.link} ${isActive(pathname, "/register") ? styles.active : ""}`}
+                href="/register"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Register
+              </Link>
+            </>
           )}
         </nav>
       </div>

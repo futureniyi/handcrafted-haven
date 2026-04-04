@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "../auth-form.module.css";
+import { useSession } from "../SessionProvider";
 
 type LoginResponse = {
   token?: string;
@@ -18,6 +19,7 @@ type LoginResponse = {
 
 export default function LoginForm() {
   const router = useRouter();
+  const { setSession } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -49,8 +51,13 @@ export default function LoginForm() {
         throw new Error(data.error || "Login failed");
       }
 
-      window.localStorage.setItem("token", data.token);
-      window.localStorage.setItem("user", JSON.stringify(data.user));
+      setSession({
+        token: data.token,
+        user: {
+          ...data.user,
+          role: data.user.role === "seller" ? "seller" : "user",
+        },
+      });
 
       const nextPath = data.user.role === "seller" ? "/dashboard" : "/catalog";
 

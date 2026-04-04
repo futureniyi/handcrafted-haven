@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getServerSessionFromCookies } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
 import Product from "@/models/Product";
 import { getProductImageSrc } from "@/src/lib/product-image";
+import { isSellerOwner } from "@/src/lib/ownership";
 import ReviewsSection from "./ReviewsSection";
 import styles from "./page.module.css";
 
@@ -25,6 +27,7 @@ type ProductPageData = {
     id: string;
     name: string;
   } | null;
+  sellerId: string;
 };
 
 function formatCategory(category: string) {
@@ -50,6 +53,9 @@ async function getProduct(id: string): Promise<ProductPageData | null> {
     price: typeof product.price === "number" ? product.price : null,
     category: product.category || "other",
     images: Array.isArray(product.images) ? product.images : [],
+    sellerId: product.sellerId?._id
+      ? product.sellerId._id.toString()
+      : product.sellerId?.toString?.() || "",
     seller: product.sellerId
       ? {
           id: product.sellerId._id.toString(),
@@ -83,10 +89,13 @@ export default async function ProductDetailPage({
 }: ProductDetailPageProps) {
   const { id } = await params;
   const product = await getProduct(id);
+  const session = await getServerSessionFromCookies();
 
   if (!product) {
     notFound();
   }
+
+  const canEditProduct = isSellerOwner(session, product.sellerId);
 
   return (
     <main className={styles.main}>
@@ -108,6 +117,17 @@ export default async function ProductDetailPage({
         </div>
 
         <div className={styles.panel}>
+          {canEditProduct ? (
+            <div className={styles.ownerActionRow}>
+              <Link
+                className={styles.ownerActionButton}
+                href={`/dashboard/products/${product.id}/edit`}
+              >
+                Edit Product
+              </Link>
+            </div>
+          ) : null}
+
           <p className={styles.category}>{formatCategory(product.category)}</p>
           <h1 className={styles.title}>{product.name}</h1>
           <p className={styles.price}>
@@ -138,7 +158,7 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      <ReviewsSection productId={product.id} />
+      <ReviewsSection productId={product.id} sellerId={product.sellerId} />
     </main>
   );
 }

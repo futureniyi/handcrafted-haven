@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSessionFromCookies } from "@/lib/auth";
-import DashboardShell from "./DashboardShell";
+import ProfileFormClient from "../ProfileFormClient";
 
 export const metadata: Metadata = {
-  title: {
-    template: "%s | Seller Dashboard",
-    default: "Seller Dashboard",
-  },
+  title: "Edit Profile",
+  description:
+    "Update your public seller bio and story from the Handcrafted Haven dashboard.",
 };
 
-type DashboardLayoutProps = {
-  children: React.ReactNode;
-};
-
-export default async function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardProfilePage() {
   const session = await getServerSessionFromCookies();
 
   if (!session) {
@@ -25,5 +20,5 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
     redirect("/catalog");
   }
 
-  return <DashboardShell>{children}</DashboardShell>;
+  return <ProfileFormClient seller={session.user} />;
 }

@@ -1,38 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
-import { verifyToken } from '@/lib/auth';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import { getRequestSession } from '@/lib/auth';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const session = await getRequestSession(request);
+    if (!session) {
       return NextResponse.json(
-        { error: 'No token provided' },
+        { error: 'Please log in to continue' },
         { status: 401 }
       );
     }
 
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
-        { status: 401 }
-      );
-    }
-
-    await dbConnect();
-
-    // Verify user is a seller
-    const user = await User.findById(decoded.userId);
-    if (!user || user.role !== 'seller') {
+    if (session.user.role !== 'seller') {
       return NextResponse.json(
         { error: 'Only sellers can upload images' },
         { status: 403 }
@@ -69,7 +52,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8);
-    const filename = `${user._id}-${timestamp}-${random}-${file.name}`;
+    const filename = `${session.user.id}-${timestamp}-${random}-${file.name}`;
 
     // Upload to Vercel Blob
     const blob = await put(filename, file, {

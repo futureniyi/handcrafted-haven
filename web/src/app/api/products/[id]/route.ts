@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-import { verifyToken } from '@/lib/auth';
+import { getRequestSession } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Product from '@/models/Product';
-import User from '@/models/User';
 
 export async function GET(
   request: NextRequest,
@@ -57,21 +56,10 @@ export async function PUT(
       );
     }
 
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const session = await getRequestSession(request);
+    if (!session) {
       return NextResponse.json(
-        { error: 'No token provided' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
+        { error: 'Please log in to continue' },
         { status: 401 }
       );
     }
@@ -85,7 +73,7 @@ export async function PUT(
       );
     }
 
-    if (product.sellerId.toString() !== decoded.userId) {
+    if (product.sellerId.toString() !== session.user.id) {
       return NextResponse.json(
         { error: 'Not authorized to update this product' },
         { status: 403 }
@@ -202,21 +190,10 @@ export async function DELETE(
       );
     }
 
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const session = await getRequestSession(request);
+    if (!session) {
       return NextResponse.json(
-        { error: 'No token provided' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
+        { error: 'Please log in to continue' },
         { status: 401 }
       );
     }
@@ -230,7 +207,7 @@ export async function DELETE(
       );
     }
 
-    if (product.sellerId.toString() !== decoded.userId) {
+    if (product.sellerId.toString() !== session.user.id) {
       return NextResponse.json(
         { error: 'Not authorized to delete this product' },
         { status: 403 }

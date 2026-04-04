@@ -50,6 +50,32 @@
   background: #fff;
 }
 
+.ownerActionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.ownerActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.ownerActionButton:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
 .category {
   display: inline-flex;
   margin: 0 0 0.9rem;
@@ -103,7 +129,7 @@
 }
 
 .sellerLink:hover {
-    color: var(--text-color);
+  color: var(--text-color);
 }
 
 .reviews {
@@ -266,7 +292,8 @@
 .reviewTextarea:focus,
 .reviewButton:focus,
 .backLink:focus,
-.sellerLink:focus {
+.sellerLink:focus,
+.ownerActionButton:focus {
   outline: 3px solid #93c5fd;
   outline-offset: 2px;
 }

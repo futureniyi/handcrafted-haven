@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import type { Metadata } from "next";
 import AppHeader from "./AppHeader";
+import { getServerSessionFromCookies } from "@/lib/auth";
+import SessionProvider from "./SessionProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -22,21 +24,22 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSessionFromCookies();
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AppHeader />
-        {children}
+        <SessionProvider initialSession={session}>
+          <AppHeader />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

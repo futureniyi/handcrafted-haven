@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "../auth-form.module.css";
+import { useSession } from "../SessionProvider";
 
 type RegisterResponse = {
   token?: string;
@@ -18,6 +19,7 @@ type RegisterResponse = {
 
 export default function RegisterForm() {
   const router = useRouter();
+  const { setSession } = useSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,8 +55,13 @@ export default function RegisterForm() {
         throw new Error(data.error || "Registration failed");
       }
 
-      window.localStorage.setItem("token", data.token);
-      window.localStorage.setItem("user", JSON.stringify(data.user));
+      setSession({
+        token: data.token,
+        user: {
+          ...data.user,
+          role: data.user.role === "seller" ? "seller" : "user",
+        },
+      });
 
       const nextPath = data.user.role === "seller" ? "/dashboard" : "/catalog";
 
