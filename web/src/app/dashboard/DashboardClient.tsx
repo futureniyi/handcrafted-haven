@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { getProductImageSrc } from "@/src/lib/product-image";
 import styles from "./DashboardClient.module.css";
 import { formatCategory, type ProductCategory } from "./dashboard-data";
 
@@ -59,7 +61,6 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [user, setUser] = useState<StoredUser | null>(null);
 
   useEffect(() => {
     async function loadProducts() {
@@ -69,7 +70,6 @@ export default function DashboardClient() {
         setSuccessMessage("");
 
         const storedUser = getStoredUser();
-        setUser(storedUser);
 
         if (!storedUser || storedUser.role !== "seller" || !storedUser.id) {
           setErrorMessage("Please log in as a seller to manage products.");
@@ -198,17 +198,13 @@ export default function DashboardClient() {
                   key={product._id}
                 >
                   <div className={`${styles.imageFrame} ${styles.imageFrameList}`}>
-                    {imageUrl ? (
-                      <img
-                        alt={product.name || "Product image"}
-                        className={styles.image}
-                        src={imageUrl}
-                      />
-                    ) : (
-                      <span className={styles.imageFallback}>
-                        No image preview available
-                      </span>
-                    )}
+                    <Image
+                      alt={product.name || "Product image"}
+                      className={styles.image}
+                      src={getProductImageSrc(imageUrl)}
+                      fill
+                      sizes="92px"
+                    />
                   </div>
 
                   <div className={styles.productBody}>

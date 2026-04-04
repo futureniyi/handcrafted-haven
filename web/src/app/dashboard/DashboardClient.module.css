@@ -69,6 +69,7 @@
 }
 
 .imageFrame {
+  position: relative;
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -87,13 +88,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.imageFallback {
-  color: var(--text-color);
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 0.5rem;
 }
 
 .productBody {
@@ -230,6 +224,43 @@
   font-size: 0.9rem;
 }
 
+.uploadPreview {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.9rem;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff, #f8fafc);
+}
+
+.uploadPreviewFrame {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f1f5f9;
+}
+
+.uploadPreviewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadPreviewBody {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.uploadPreviewText {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
 .successText {
   margin: 0;
   color: #166534;
@@ -280,5 +311,15 @@
   .button,
   .secondaryButton {
     width: 100%;
+  }
+
+  .uploadPreview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .uploadPreviewFrame {
+    width: 100%;
+    height: 180px;
   }
 }

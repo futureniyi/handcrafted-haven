@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getProductImageSrc } from "@/src/lib/product-image";
 import styles from "./CatalogClient.module.css";
 
 type Product = {
@@ -283,17 +284,13 @@ export default function CatalogClient() {
               className={styles.card}
             >
               <div className={styles.imageFrame}>
-                {product.images && product.images.length > 0 ? (
-                  <Image
-                    src={product.images[0]}
-                    alt={product.name || "Product image"}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 980px) 50vw, 240px"
-                    className={styles.image}
-                  />
-                ) : (
-                  <span>No image</span>
-                )}
+                <Image
+                  src={getProductImageSrc(product.images?.[0])}
+                  alt={product.name || "Product image"}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 980px) 50vw, 240px"
+                  className={styles.image}
+                />
               </div>
 
               <h2 className={styles.cardTitle}>

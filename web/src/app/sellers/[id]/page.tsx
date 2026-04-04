@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
+import { getProductImageSrc } from "@/src/lib/product-image";
 import Product from "@/models/Product";
 import User from "@/models/User";
 import styles from "./page.module.css";
@@ -128,15 +130,13 @@ export default async function SellerProfilePage({
             {seller.products.map((product) => (
               <article className={styles.card} key={product.id}>
                 <div className={styles.imageFrame}>
-                  {product.imageUrl ? (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className={styles.image}
-                    />
-                  ) : (
-                    <span className={styles.imageFallback}>No image available</span>
-                  )}
+                  <Image
+                    src={getProductImageSrc(product.imageUrl)}
+                    alt={product.name}
+                    className={styles.image}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 240px"
+                  />
                 </div>
 
                 <h3 className={styles.cardTitle}>{product.name}</h3>

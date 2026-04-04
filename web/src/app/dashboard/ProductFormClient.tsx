@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./DashboardClient.module.css";
@@ -24,6 +25,11 @@ type ProductApiResponse = {
   category?: string;
   images?: string[];
   inStock?: boolean;
+  error?: string;
+};
+
+type UploadApiResponse = {
+  url?: string;
   error?: string;
 };
 
@@ -63,6 +69,8 @@ export default function ProductFormClient({
   const [initialForm, setInitialForm] = useState<ProductFormState>(defaultFormState);
   const [loadingProduct, setLoadingProduct] = useState(mode === "edit");
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const [statusMessage, setStatusMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -116,14 +124,90 @@ export default function ProductFormClient({
   function handleReset() {
     if (mode === "edit") {
       setForm(initialForm);
+      setFileInputKey((current) => current + 1);
       return;
     }
 
     setForm(defaultFormState);
+    setFileInputKey((current) => current + 1);
+  }
+
+  async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const token = window.localStorage.getItem("token");
+
+    if (!token) {
+      setErrorMessage("Please log in as a seller before uploading an image.");
+      setFileInputKey((current) => current + 1);
+      return;
+    }
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setErrorMessage("Only JPG, PNG, and WebP files are supported.");
+      setFileInputKey((current) => current + 1);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorMessage("File must be less than 5MB.");
+      setFileInputKey((current) => current + 1);
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      setErrorMessage("");
+      setStatusMessage("");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data: UploadApiResponse = await response.json();
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || "Failed to upload image.");
+      }
+
+      updateForm("imageUrl", data.url);
+      setStatusMessage("Image uploaded successfully.");
+    } catch (error) {
+      console.error("Product image upload error:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to upload image.",
+      );
+    } finally {
+      setUploadingImage(false);
+      setFileInputKey((current) => current + 1);
+    }
+  }
+
+  function handleRemoveImage() {
+    updateForm("imageUrl", "");
+    setStatusMessage("");
+    setErrorMessage("");
+    setFileInputKey((current) => current + 1);
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (uploadingImage) {
+      setErrorMessage("Please wait for the image upload to finish.");
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -138,6 +222,11 @@ export default function ProductFormClient({
       }
 
       const parsedPrice = Number(form.price);
+
+      if (!form.name.trim()) {
+        setErrorMessage("Product name is required.");
+        return;
+      }
 
       if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
         setErrorMessage("Price must be a valid non-negative number.");
@@ -301,16 +390,47 @@ export default function ProductFormClient({
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="product-image-url">
-              Image URL
+            <label className={styles.label} htmlFor="product-image-upload">
+              Product image
             </label>
             <input
-              id="product-image-url"
+              key={fileInputKey}
+              id="product-image-upload"
               className={styles.input}
-              type="url"
-              value={form.imageUrl}
-              onChange={(event) => updateForm("imageUrl", event.target.value)}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleImageUpload}
+              disabled={uploadingImage || submitting}
             />
+            <p className={styles.helperText}>
+              Upload a JPG, PNG, or WebP image up to 5MB.
+            </p>
+            {form.imageUrl ? (
+              <div className={styles.uploadPreview}>
+                <div className={styles.uploadPreviewFrame}>
+                  <Image
+                    alt={`${form.name || "Product"} preview`}
+                    className={styles.uploadPreviewImage}
+                    src={form.imageUrl}
+                    fill
+                    sizes="120px"
+                  />
+                </div>
+                <div className={styles.uploadPreviewBody}>
+                  <p className={styles.uploadPreviewText}>
+                    {uploadingImage ? "Uploading image..." : "Image ready"}
+                  </p>
+                  <button
+                    className={styles.secondaryButton}
+                    type="button"
+                    onClick={handleRemoveImage}
+                    disabled={uploadingImage || submitting}
+                  >
+                    Remove Image
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <label className={styles.checkboxRow} htmlFor="product-in-stock">
@@ -327,11 +447,17 @@ export default function ProductFormClient({
           {statusMessage && <p className={styles.successText}>{statusMessage}</p>}
 
           <div className={styles.cardActions}>
-            <button className={styles.button} disabled={submitting} type="submit">
+            <button
+              className={styles.button}
+              disabled={submitting || uploadingImage}
+              type="submit"
+            >
               {submitting
                 ? mode === "create"
                   ? "Creating..."
                   : "Saving..."
+                : uploadingImage
+                  ? "Uploading Image..."
                 : mode === "create"
                   ? "Create Product"
                   : "Save Changes"}
@@ -340,6 +466,7 @@ export default function ProductFormClient({
               className={styles.secondaryButton}
               type="button"
               onClick={handleReset}
+              disabled={submitting || uploadingImage}
             >
               Reset Form
             </button>

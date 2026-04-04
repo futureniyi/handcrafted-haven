@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import dbConnect from "@/lib/mongodb";
 import Product from "@/models/Product";
+import { getProductImageSrc } from "@/src/lib/product-image";
 import ReviewsSection from "./ReviewsSection";
 import styles from "./page.module.css";
 
@@ -95,15 +97,13 @@ export default async function ProductDetailPage({
       <section className={styles.layout}>
         <div className={styles.gallery}>
           <div className={styles.imageFrame}>
-            {product.images.length > 0 ? (
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className={styles.image}
-              />
-            ) : (
-              <span className={styles.imageFallback}>No product image available.</span>
-            )}
+            <Image
+              src={getProductImageSrc(product.images[0])}
+              alt={product.name}
+              className={styles.image}
+              fill
+              sizes="(max-width: 980px) 100vw, 50vw"
+            />
           </div>
         </div>
 

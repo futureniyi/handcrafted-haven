@@ -1,3 +1,5 @@
+import { PRODUCT_FALLBACK_IMAGE } from "@/src/lib/product-image";
+
 export type ProductCategory = "jewelry" | "clothing" | "home-decor" | "art" | "other";
 
 export type SellerProduct = {
@@ -43,7 +45,7 @@ export const mockProducts: SellerProduct[] = [
     description: "Handwoven seagrass basket designed for small-space wall styling.",
     price: "42.00",
     category: "home-decor",
-    imageUrl: "https://placehold.co/600x400?text=Woven+Wall+Basket",
+    imageUrl: PRODUCT_FALLBACK_IMAGE,
     inStock: true,
   },
   {
@@ -52,7 +54,7 @@ export const mockProducts: SellerProduct[] = [
     description: "Lightweight handcrafted pendants with earthy finishes and brass hooks.",
     price: "28.50",
     category: "jewelry",
-    imageUrl: "https://placehold.co/600x400?text=Clay+Pendant+Set",
+    imageUrl: PRODUCT_FALLBACK_IMAGE,
     inStock: false,
   },
 ];
