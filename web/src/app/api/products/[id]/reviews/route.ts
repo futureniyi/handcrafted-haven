@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-import { verifyToken } from '@/lib/auth';
+import { getRequestSession } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Review from '@/models/Review';
 import Product from '@/models/Product';
@@ -72,21 +72,10 @@ export async function POST(
       );
     }
 
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const session = await getRequestSession(request);
+    if (!session) {
       return NextResponse.json(
-        { error: 'No token provided' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
+        { error: 'Please log in to submit a review' },
         { status: 401 }
       );
     }
@@ -100,10 +89,16 @@ export async function POST(
       );
     }
 
-    // Check if user already reviewed this product
+    if (product.sellerId.toString() === session.user.id) {
+      return NextResponse.json(
+        { error: 'Sellers cannot review their own products' },
+        { status: 403 }
+      );
+    }
+
     const existingReview = await Review.findOne({
       productId: id,
-      userId: decoded.userId,
+      userId: session.user.id,
     });
 
     if (existingReview) {
@@ -164,7 +159,7 @@ export async function POST(
     // Create review
     const review = await Review.create({
       productId: id,
-      userId: decoded.userId,
+      userId: session.user.id,
       rating,
       comment: comment || '',
     });

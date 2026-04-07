@@ -28,7 +28,7 @@
 
 .sidebarText {
   margin: 0 0 1rem;
-  color: #64748b;
+  color: var(--text-color);
   font-size: 0.95rem;
   line-height: 1.6;
 }

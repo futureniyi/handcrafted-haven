@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getServerSessionFromCookies } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
+import { getProductImageSrc } from "@/src/lib/product-image";
 import Product from "@/models/Product";
 import User from "@/models/User";
+import { isSellerOwner } from "@/src/lib/ownership";
 import styles from "./page.module.css";
 
 type SellerProfilePageProps = {
@@ -94,10 +98,13 @@ export default async function SellerProfilePage({
 }: SellerProfilePageProps) {
   const { id } = await params;
   const seller = await getSellerProfile(id);
+  const session = await getServerSessionFromCookies();
 
   if (!seller) {
     notFound();
   }
+
+  const canEditProfile = isSellerOwner(session, seller.id);
 
   return (
     <main className={styles.main}>
@@ -109,6 +116,11 @@ export default async function SellerProfilePage({
         <p className={styles.eyebrow}>Seller Profile</p>
         <h1 className={styles.title}>{seller.name}</h1>
         <p className={styles.bio}>{seller.bio}</p>
+        {canEditProfile ? (
+          <Link className={styles.productLink} href="/dashboard/profile">
+            Edit Profile
+          </Link>
+        ) : null}
       </section>
 
       <section className={styles.storySection}>
@@ -128,15 +140,13 @@ export default async function SellerProfilePage({
             {seller.products.map((product) => (
               <article className={styles.card} key={product.id}>
                 <div className={styles.imageFrame}>
-                  {product.imageUrl ? (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className={styles.image}
-                    />
-                  ) : (
-                    <span className={styles.imageFallback}>No image available</span>
-                  )}
+                  <Image
+                    src={getProductImageSrc(product.imageUrl)}
+                    alt={product.name}
+                    className={styles.image}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 240px"
+                  />
                 </div>
 
                 <h3 className={styles.cardTitle}>{product.name}</h3>

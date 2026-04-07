@@ -45,7 +45,7 @@
 
 .meta {
   margin: 0 0 0.5rem;
-  color: #64748b;
+  color: var(--text-color);
   font-size: 0.92rem;
 }
 
@@ -62,8 +62,12 @@
 }
 
 .link {
-  color: #1d4ed8;
+  color: var(--accent);
   text-underline-offset: 2px;
+}
+
+.link:hover {
+    color: var(--text-color);
 }
 
 .empty {

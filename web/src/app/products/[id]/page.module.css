@@ -7,7 +7,7 @@
 .backLink {
   display: inline-block;
   margin-bottom: 1.25rem;
-  color: #1d4ed8;
+  color: var(--accent);
   text-underline-offset: 2px;
 }
 
@@ -26,6 +26,7 @@
 }
 
 .imageFrame {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,16 +43,37 @@
   object-fit: cover;
 }
 
-.imageFallback {
-  color: #475569;
-  font-size: 0.95rem;
-}
-
 .panel {
   border: 1px solid #e5e7eb;
   border-radius: 18px;
   padding: 1.5rem;
   background: #fff;
+}
+
+.ownerActionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.ownerActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.ownerActionButton:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
 }
 
 .category {
@@ -60,7 +82,7 @@
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
   background: #eff6ff;
-  color: #1d4ed8;
+  color: var(--accent);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -102,8 +124,12 @@
 }
 
 .sellerLink {
-  color: #1d4ed8;
+  color: var(--accent);
   text-underline-offset: 2px;
+}
+
+.sellerLink:hover {
+  color: var(--text-color);
 }
 
 .reviews {
@@ -157,7 +183,7 @@
 
 .ratingStars,
 .reviewStars {
-  color: #f59e0b;
+  color: var(--accent);
   letter-spacing: 0.06em;
 }
 
@@ -182,7 +208,7 @@
 
 .reviewHelper {
   margin: 0 0 1rem;
-  color: #64748b;
+  color: var(--text-color);
   line-height: 1.6;
 }
 
@@ -212,7 +238,7 @@
 
 .reviewDate {
   margin: 0;
-  color: #64748b;
+  color: var(--text-color);
   font-size: 0.9rem;
 }
 
@@ -266,7 +292,8 @@
 .reviewTextarea:focus,
 .reviewButton:focus,
 .backLink:focus,
-.sellerLink:focus {
+.sellerLink:focus,
+.ownerActionButton:focus {
   outline: 3px solid #93c5fd;
   outline-offset: 2px;
 }

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className={styles.main}>
+    <main id="main-content" className={styles.main}>
       {/* Hero */}
       <section className={styles.hero}>
         <p className={styles.eyebrow}>A marketplace for handmade items</p>
@@ -66,8 +66,8 @@ export default function Home() {
       <section className={styles.section}>
         <h2 className={styles.sellerTitle}>For Sellers</h2>
         <p className={styles.sellerText}>
-          Sellers will have their own profile page and can manage product listings
-          (title, description, price, category, and image). Seller-only actions will
+          Sellers have their own profile pages and can manage product listings
+          (title, description, price, category, and image). Seller-only actions
           require login.
         </p>
       </section>

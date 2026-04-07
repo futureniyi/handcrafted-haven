@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { getRequestSession } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import Product from '@/models/Product';
@@ -55,36 +55,23 @@ export async function PUT(
 
     const { id } = await params;
 
-    // Verify authentication
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const session = await getRequestSession(request);
+    if (!session) {
       return NextResponse.json(
-        { error: 'No token provided' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
+        { error: 'Please log in to continue' },
         { status: 401 }
       );
     }
 
     // Ensure the user is updating their own profile
-    if (decoded.userId !== id) {
+    if (session.user.id !== id) {
       return NextResponse.json(
         { error: 'Not authorized to update this profile' },
         { status: 403 }
       );
     }
 
-    // Ensure the user is a seller
-    const user = await User.findById(decoded.userId);
-    if (!user || user.role !== 'seller') {
+    if (session.user.role !== 'seller') {
       return NextResponse.json(
         { error: 'Only sellers can update their profile' },
         { status: 403 }

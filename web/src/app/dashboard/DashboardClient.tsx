@@ -1,16 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { getProductImageSrc } from "@/src/lib/product-image";
 import styles from "./DashboardClient.module.css";
 import { formatCategory, type ProductCategory } from "./dashboard-data";
-
-type StoredUser = {
-  id?: string;
-  email?: string;
-  name?: string;
-  role?: string;
-};
+import { useSession } from "../SessionProvider";
 
 type SellerRef =
   | string
@@ -38,16 +34,6 @@ type ProductsResponse = {
   error?: string;
 };
 
-function getStoredUser(): StoredUser | null {
-  try {
-    const raw = window.localStorage.getItem("user");
-    if (!raw) return null;
-    return JSON.parse(raw) as StoredUser;
-  } catch {
-    return null;
-  }
-}
-
 function getSellerId(value: SellerRef): string {
   if (!value) return "";
   if (typeof value === "string") return value;
@@ -55,11 +41,11 @@ function getSellerId(value: SellerRef): string {
 }
 
 export default function DashboardClient() {
+  const { session } = useSession();
   const [products, setProducts] = useState<DashboardProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [user, setUser] = useState<StoredUser | null>(null);
 
   useEffect(() => {
     async function loadProducts() {
@@ -68,10 +54,7 @@ export default function DashboardClient() {
         setErrorMessage("");
         setSuccessMessage("");
 
-        const storedUser = getStoredUser();
-        setUser(storedUser);
-
-        if (!storedUser || storedUser.role !== "seller" || !storedUser.id) {
+        if (session?.user.role !== "seller" || !session.user.id) {
           setErrorMessage("Please log in as a seller to manage products.");
           setProducts([]);
           return;
@@ -90,7 +73,7 @@ export default function DashboardClient() {
         const allProducts = Array.isArray(data.products) ? data.products : [];
 
         const sellerProducts = allProducts.filter(
-          (product) => getSellerId(product.sellerId) === storedUser.id,
+          (product) => getSellerId(product.sellerId) === session.user.id,
         );
 
         setProducts(sellerProducts);
@@ -106,7 +89,7 @@ export default function DashboardClient() {
     }
 
     loadProducts();
-  }, []);
+  }, [session]);
 
   async function handleDelete(productId: string) {
     const confirmed = window.confirm(
@@ -121,7 +104,7 @@ export default function DashboardClient() {
       setErrorMessage("");
       setSuccessMessage("");
 
-      const token = window.localStorage.getItem("token");
+      const token = session?.token;
 
       if (!token) {
         setErrorMessage("Please log in again before deleting a product.");
@@ -154,7 +137,7 @@ export default function DashboardClient() {
   }
 
   return (
-    <main className={styles.main}>
+    <main id="main-content" className={styles.main}>
       <div className={styles.pageHeader}>
         <div>
           <h1>Seller Dashboard</h1>
@@ -175,8 +158,17 @@ export default function DashboardClient() {
           your store.
         </p>
 
-        {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
-        {successMessage && <p className={styles.successText}>{successMessage}</p>}
+        {errorMessage && (
+          <p className={styles.errorText} role="alert">
+            {errorMessage}
+          </p>
+        )}
+
+        {successMessage && (
+          <p className={styles.successText} aria-live="polite">
+            {successMessage}
+          </p>
+        )}
 
         {loading ? (
           <p className={styles.emptyState}>Loading your products...</p>
@@ -198,17 +190,13 @@ export default function DashboardClient() {
                   key={product._id}
                 >
                   <div className={`${styles.imageFrame} ${styles.imageFrameList}`}>
-                    {imageUrl ? (
-                      <img
-                        alt={product.name || "Product image"}
-                        className={styles.image}
-                        src={imageUrl}
-                      />
-                    ) : (
-                      <span className={styles.imageFallback}>
-                        No image preview available
-                      </span>
-                    )}
+                    <Image
+                      alt={product.name || "Product image"}
+                      className={styles.image}
+                      src={getProductImageSrc(imageUrl)}
+                      fill
+                      sizes="92px"
+                    />
                   </div>
 
                   <div className={styles.productBody}>
