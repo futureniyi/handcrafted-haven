@@ -54,10 +54,25 @@ export async function POST(request: NextRequest) {
     const random = Math.random().toString(36).substring(2, 8);
     const filename = `${session.user.id}-${timestamp}-${random}-${file.name}`;
 
-    // Upload to Vercel Blob
-    const blob = await put(filename, file, {
-      access: 'public',
-    });
+    // Check if we're in local development (no Vercel Blob token)
+    const isLocalDev = !process.env.BLOB_READ_WRITE_TOKEN && process.env.NODE_ENV !== 'production';
+
+    let blob;
+    if (isLocalDev) {
+      // In local development, return a mock URL for testing
+      const mockUrl = `http://localhost:3000/mock-uploads/${filename}`;
+      return NextResponse.json({
+        url: mockUrl,
+        size: file.size,
+        type: file.type,
+        note: 'Local development: using mock URL'
+      });
+    } else {
+      // Upload to Vercel Blob
+      blob = await put(filename, file, {
+        access: 'public',
+      });
+    }
 
     return NextResponse.json({
       url: blob.url,

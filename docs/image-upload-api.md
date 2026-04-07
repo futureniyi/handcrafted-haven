@@ -89,9 +89,13 @@ const productResponse = await fetch('/api/products', {
 ## Implementation Notes
 
 ### Local Development
-- Vercel Blob is not available in local development by default
-- Image uploads will fail locally unless Vercel CLI is configured
-- Recommendation: Use mock URLs for testing during development, or test via Vercel Preview deployment
+- Vercel Blob requires `BLOB_READ_WRITE_TOKEN` environment variable
+- Without the token, the API returns mock URLs for testing purposes
+- To use real blob storage locally:
+  1. Install Vercel CLI: `npm i -g vercel`
+  2. Link project: `vercel link`
+  3. Pull environment: `vercel env pull .env.local`
+- Or manually set `BLOB_READ_WRITE_TOKEN` in your `.env.local`
 
 ### File Storage
 - Images are stored in Vercel Blob with public access
