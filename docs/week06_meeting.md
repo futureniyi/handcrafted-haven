@@ -20,7 +20,7 @@ Final Project Video
 
 ## Action Items (Next Steps)
 - Olaniyi Bello, Daniel Olayinka Oyeniyi, Steven Kemendics
-    - Submit your project: https://youtu.be/Di1BYdqHWmE?si=Z6TVXrRpdrAKpI-s
+    - Submit your project: https://youtu.be/Di1BYdqHWmE?si=qpvCUbfNOfYTcTFi 
     - Submit Peer Review
 
 
